@@ -76,14 +76,20 @@ def predict():
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
   openai.api_key = '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'
-  completion = openai.ChatCompletion.create(
-  model="gpt-3.5-turbo",
-  messages=[
-    {"role": "system", "content": "Hello!"},
-  ]
-)
+  content_type = request.headers.get('Content-Type')
+  if (content_type == 'application/json'):
+    json = request.get_json() 
 
-  pass
+    if json.get('msg') == "success":
+      prediction = json.get('prediction')
+      prediction = np.array(prediction)
+      prediction = prediction.argmax(axis=1)
+
+      landmarks = json.get('landmarks')
+
+      output = {landmarks[i].split('.')[0]: f"level{prediction[i]}" for i in range(len(landmarks))}
+    return output
+
 
 if __name__ == '__main__':
   app.run(debug=True)
