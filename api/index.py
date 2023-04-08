@@ -8,6 +8,8 @@ from PIL import Image
 import numpy as np
 import os
 import shutil
+import openai
+
 
 app = Flask(__name__)
 
@@ -70,6 +72,18 @@ def predict():
       prediction = prediction.tolist()
       shutil.rmtree(os.path.join(BASE_DIR, 'patches'))
       return json.dumps({"msg": "success", "prediction": prediction, "landmarks": landmarks})
-    
+
+@app.route('/recommendation', methods=['POST'])
+def recommendation():
+  openai.api_key = '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'
+  completion = openai.ChatCompletion.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "Hello!"},
+  ]
+)
+
+  pass
+
 if __name__ == '__main__':
   app.run(debug=True)
