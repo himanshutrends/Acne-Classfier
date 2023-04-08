@@ -9,7 +9,8 @@ import numpy as np
 import os
 import shutil
 import openai
-
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -82,7 +83,7 @@ def predict():
 
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
-    openai.api_key = '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'
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = request.get_json()
@@ -150,7 +151,7 @@ def recommendation():
                     {"role": "user", "content": f"{output}"},
                 ]
             )
-            
+
         return completion
 
 
