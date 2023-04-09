@@ -51,7 +51,7 @@ demo = gr.Interface(
         gr.Radio(["Male", "Female", "Other"], label="Gender", info="Your Gender"),
         gr.CheckboxGroup(["Oily", "Dry", "Normal"], label="Skin", info="Skin Type"), 
         gr.Dropdown(
-            ["benzoyl peroxide", "salicylic acid", "Sun-exposure", "Itching", "Swelling", "Redness"], 
+            ["benzoyl peroxide", "salicylic acid", "Sun-exposure", "Itching", "Swelling", "Redness", "None"], 
             multiselect=True, label="Allergies", 
             info="Tell us your allergies and symptoms"
         ),
