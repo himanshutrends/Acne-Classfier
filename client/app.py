@@ -18,13 +18,25 @@ def sentence_builder(age, sex, skin_type, allergies, diet, file):
 
     response = requests.post('http://127.0.0.1:5000/predict', files=payload)
     data = response.json()
-    
-    response = requests.post('http://127.0.0.1:5000/recommendation', json=data)
-    data = response.json()
 
-    content = data['choices'][0]['message']['content']
+    prediction = data['prediction']
+    prediction = np.array(prediction)
     
-    return content
+
+    labels = ["Low", "Moderate", "Severe"]
+
+    output1 = {labels[i]: float(prediction[0][i]) for i in range(3)}
+    output2 = {labels[i]: float(prediction[1][i]) for i in range(3)}
+    output3 = {labels[i]: float(prediction[2][i]) for i in range(3)}
+
+    content = "sample response"
+
+    # response = requests.post('http://127.0.0.1:5000/recommendation', json=data)
+    # data = response.json()
+
+    # content = data['choices'][0]['message']['content']
+    
+    return data, output1, output2, output3
 
 demo = gr.Interface(
     sentence_builder,
@@ -40,7 +52,7 @@ demo = gr.Interface(
         gr.CheckboxGroup(["Veg", "Non-Veg",], label="Diet", info="Select your diet preference"),
         gr.Image(type="pil", label="Face Image (with open eye)"),
     ],
-    "text",
+    outputs=["text", gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level")]
 )
 
 if __name__ == "__main__":
