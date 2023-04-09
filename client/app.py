@@ -7,6 +7,7 @@ import PIL
 import os
 import json
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def sentence_builder(age, sex, skin_type, allergies, diet, file):
     print(age, sex, skin_type, allergies, diet)
@@ -41,25 +42,31 @@ def sentence_builder(age, sex, skin_type, allergies, diet, file):
 
 
     content = data['choices'][0]['message']['content']
-    
     return content, output1, output2, output3
 
-demo = gr.Interface(
-    sentence_builder,
-    [
-        gr.Number(value=20, label="Age"),
-        gr.Radio(["Male", "Female", "Other"], label="Gender", info="Your Gender"),
-        gr.CheckboxGroup(["Oily", "Dry", "Normal"], label="Skin", info="Skin Type"), 
-        gr.Dropdown(
-            ["benzoyl peroxide", "salicylic acid", "Sun-exposure", "Itching", "Swelling", "Redness"], 
-            multiselect=True, label="Allergies", 
-            info="Tell us your allergies and symptoms"
-        ),
-        gr.CheckboxGroup(["Veg", "Non-Veg",], label="Diet", info="Select your diet preference"),
-        gr.Image(type="pil", label="Face Image (with open eye)"),
-    ],
-    outputs=[gr.HTML("html"), gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level")]
-)
+with gr.Blocks() as demo:
+    gr.Markdown("Flip text or image files using this demo.")
+    with gr.Row():
+        with gr.Column():
+            age = gr.Number(value=20, label="Age")
+            sex = gr.Radio(["Male", "Female", "Other"], label="Gender", info="Your Gender")
+            skin_type = gr.CheckboxGroup(["Oily", "Dry", "Normal"], label="Skin", info="Skin Type")
+            allergy = gr.Dropdown(
+                ["benzoyl peroxide", "salicylic acid", "Sun-exposure", "Itching", "Swelling", "Redness"],
+                multiselect=True, label="Allergies", 
+                info="Tell us your allergies and symptoms"
+            )
+            diet = gr.CheckboxGroup(["Veg", "Non-Veg",], label="Diet", info="Select your diet preference")
+            img = gr.Image(source="upload", type="pil", label="Face Image (with open eye)")
+            submit = gr.Button("Submit")
+            
+        with gr.Tab("Model:Severity Prediction"):
+            chin = gr.Label(num_top_classes=3, label="Acne Level")
+            fh = gr.Label(num_top_classes=3, label="Acne Level")
+            lc = gr.Label(num_top_classes=3, label="Acne Level")
+        with gr.Tab("Recommendation:Treatment Plan"):
+            html_output = gr.HTML('Recommendation will be shown here')
 
-if __name__ == "__main__":
-    demo.launch()   
+    submit.click(sentence_builder, inputs=[age, sex, skin_type, allergy, diet, img], outputs=[html_output, chin, fh, lc])
+
+demo.launch(share=True, debug=True, show_api=False)
