@@ -19,6 +19,12 @@ def sentence_builder(age, sex, skin_type, allergies, diet, file):
     response = requests.post('http://127.0.0.1:5000/predict', files=payload)
     data = response.json()
     
+    data['age'] = age
+    data['gender'] = sex
+    data['skin_type'] = skin_type
+    data['allergies'] = allergies
+    data['diet'] = diet
+
     response = requests.post('http://127.0.0.1:5000/recommendation', json=data)
     data = response.json()
 
@@ -40,7 +46,7 @@ demo = gr.Interface(
         gr.CheckboxGroup(["Veg", "Non-Veg",], label="Diet", info="Select your diet preference"),
         gr.Image(type="pil", label="Face Image (with open eye)"),
     ],
-    "text",
+    gr.HTML("html"),
 )
 
 if __name__ == "__main__":
