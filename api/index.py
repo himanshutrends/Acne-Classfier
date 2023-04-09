@@ -97,7 +97,11 @@ def recommendation():
 
             output = {landmarks[i].split(
                 '.')[0]: f"level{prediction[i]}" for i in range(len(landmarks))}
-
+            output['age'] = json.get('age')
+            output['gender'] = json.get('gender')
+            output['skin_type'] = json.get('skin_type')
+            output['allergies'] = json.get('allergies')
+            output['diet'] = json.get('diet')
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -105,7 +109,7 @@ def recommendation():
 
                     {"role": "user", "content": "what do you know about acne severity levels like level 0, level 1 and level 2 ?"},
 
-                    {"role": "system", "content": """Acne severity levels are used to classify the severity of acne, with level 0 being the mildest and level 4 being the most severe. However, the commonly used system usually consists of four levels, which are described as follows:
+                    {"role": "assistant", "content": """Acne severity levels are used to classify the severity of acne, with level 0 being the mildest and level 4 being the most severe. However, the commonly used system usually consists of four levels, which are described as follows:
                     Level 0: This level is used to describe skin with no signs of acne. The skin is generally clear with no visible pimples or blemishes.
                     Level 1: This level is used to describe skin with minor acne. The skin may have some blackheads and whiteheads, but they are not widespread and there are no visible pimples.
                     Level 2: This level is used to describe skin with moderate acne. The skin may have more blackheads and whiteheads, as well as a few visible pimples.
@@ -114,13 +118,13 @@ def recommendation():
 
                     {"role": "user", "content": "okay let me teach u something new"},
 
-                    {"role": "system", "content": "Sure, I'm always open to learning something new! What would you like to teach me?"},
+                    {"role": "assistant", "content": "Sure, I'm always open to learning something new! What would you like to teach me?"},
 
                     {"role": "user", "content": """so level 0 is This level is used to describe skin with no signs of acne. The skin is generally clear with no visible pimples or blemishes.
                     level 1 This level is used to describe skin with minor acne. The skin may have some blackheads and whiteheads, but they are not widespread and there are no visible pimples.
                     level 2 This level is used to describe skin with moderate acne to severe acne. The skin may have few to many blackheads and whiteheads, as well as a few or many visible pimples, as well as some nodules and cysts. there does not exist any other level these 3 are the only levels you know about okay"""},
 
-                    {"role": "system", "content": """I apologize for the error in my previous response. You are correct that the commonly used acne severity classification system consists of three levels, not four. Here is the correct information:
+                    {"role": "assistant", "content": """I apologize for the error in my previous response. You are correct that the commonly used acne severity classification system consists of three levels, not four. Here is the correct information:
                     Level 0: This level is used to describe skin with no signs of acne. The skin is generally clear with no visible pimples or blemishes.
                     Level 1: This level is used to describe skin with mild acne. The skin may have some blackheads and whiteheads, but they are not widespread and there are no visible pimples.
                     Level 2: This level is used to describe skin with moderate to severe acne. The skin may have many blackheads and whiteheads, as well as a few or many visible pimples, as well as some nodules and cysts.
@@ -128,28 +132,77 @@ def recommendation():
 
                     {"role": "user", "content": "okay now i will tell you some instructions and the responses with boudries to which you will adhere"},
 
-                    {"role": "system", "content": "Sure, please go ahead and give me the instructions and boundaries to adhere to."},
+                    {"role": "assistant", "content": "Sure, please go ahead and give me the instructions and boundaries to adhere to."},
 
-                    {"role": "user", "content": """so we have divided a face into patches these are namely fh(forehead), lc(left cheek), rc(right cheek), ch(chin). Each time my system will analyze the face image extract the patches from it and will send them to you it is not necessary that each time you will be provided with all the 4 mentioned patches above some time the message may contain only 1 or 2 patches. I will also send the acne severity level associated with that patch like 
-                    {'fh':'level0', 'lc':'level2', 'rc':'level2', 'chin':'level0'}
-                    this json data means that the patch forehead has level0 acne and left cheek has level2 acne and so on. Now that you now what level of acne does the parts of a particular face has you will generate a week long custom made remedy and daily routine for the acne treatment. I can ask you to generate a general acne routine and remedy but i am providing you with this classified details so that the output you will generate will be more optimised and fine grade. okay that's it if you understand compelety what i just instructed to you then generate a sample response for me for the above example data. also next time i will not be sending such long detailed message just the json message that i sent above so you will not get confused and do the task as i told you."""},
+                    {"role": "user", "content": """so we have divided a face into patches these are namely fh(forehead), lc(left cheek), rc(right cheek), ch(chin). Each time my system will analyze the face image extract the patches from it and will send them to you along with some other info of the user which are Age, Gender(Male, Female, other), Skin-Type(Oily, Dry, Normal), Allergies(salicylic acid, benzoyl peroxide, Sun-exposure, Itching, Swelling, Redness), Diet(Veg, Non-veg) these are a total of 5 meta-data values about the person or individual for whom you will generate the Diet, Daily Skin-care Routine,  it is not necessary that each time you will be provided with all the 4 mentioned patches above(but you will always be provided with the 5 meta-data values of the individual)  some time the message may contain only 1 or 2 patches. I will also send the acne severity level associated with that patch like {'fh':'level0', 'lc':'level2', 'rc':'level2', 'chin':'level0', 'age':20, 'gender':'male', 'skin':'oily', 'allergies':'itching', 'diet':'veg'} this json data means that the patch forehead has level0 acne and left cheek has level2 acne and he is of age 20 and he has oily skin and have itching allergy and his diet is veg. Now that you now what level of acne does the parts of a particular face has you will generate a week long custom made remedy, diet, good habits, bad habits and daily skincare routine for the acne treatment. I can ask you to generate a general acne routine and remedy but i am providing you with this classified details so that the output you will generate will be more optimized and personalized. okay that's it if you understand completely what i just instructed to you then generate a sample response for me for the above example data. also next time i will not be sending such long detailed message just the json message that i sent above so you will not get confused and do the task as i told you. also the response should be in a raw mark up language format the language should be raw html with <br> tag at places where line break is necessary so i can copy it as it is and use it some where else. Also i need you to generate answers in way that they don't sound like they are being generated by a chat bot, leave out any sentences like "Sure, here's a customized routine for the given example:" so you need to sound like the answers are being generated by a deep learning NLP model not by a chat bot. You don't need to greet to me in the response just straight out tell the answer don't greet to me like 'here is the routine for the example' or anything like that."""},
 
-                    {"role": "system", "content": """Thank you for the detailed instructions. Yes, I understand what you have instructed me to do. Here's a sample response for the given example data:
-                    For the patch on the forehead (fh) with level 0 acne, I recommend cleansing the area twice a day with a gentle cleanser and applying a non-comedogenic moisturizer afterwards. It is also important to protect the skin from UV damage by wearing a broad-spectrum sunscreen with at least SPF 30.
-                    For the patch on the left cheek (lc) and right cheek (rc) with level 2 acne, I recommend using a salicylic acid or benzoyl peroxide-based cleanser in the morning and a glycolic or lactic acid-based cleanser in the evening to help exfoliate the skin and unclog pores. It is important to avoid using harsh scrubs or exfoliants as they can irritate the skin and worsen acne. Applying a topical acne treatment containing benzoyl peroxide or retinoids can also help reduce inflammation and breakouts. In addition, it is important to avoid touching the face and to change pillowcases regularly to prevent the transfer of bacteria.
-                    For the patch on the chin (ch) with level 0 acne, the same routine as for the forehead patch can be followed.
-                    It is important to note that the severity of acne can vary from person to person and it is recommended to consult with a dermatologist for personalized treatment options. This is a general recommendation based on the severity levels provided."""},
+                    {"role": "assistant", "content": """
+<h3>Skincare Routine:</h3>
+<ul>
+  <li>Wash your face with a gentle cleanser twice a day.</li>
+  <li>Use an alcohol-free toner after cleansing to balance your skin.</li>
+  <li>Apply a moisturizer with SPF in the morning.</li>
+  <li>Apply a retinoid cream at night to help unclog pores.</li>
+  <li>Use a clay mask once a week to draw out impurities.</li>
+</ul>
+<h3>Diet:</h3>
+<p>Since the individual has oily skin, it's recommended to follow a low-glycemic index diet which includes more fruits, vegetables, whole grains, and lean proteins. Also, since they have a vegetarian diet, they can consume more nuts, seeds, and legumes as sources of protein. It's also important to drink plenty of water and avoid sugary and processed foods as they can cause inflammation in the body and lead to acne breakouts.</p>
+<h3>Good Habits:</h3>
+<ul>
+  <li>Keep your hands off your face to prevent bacteria transfer.</li>
+  <li>Change your pillowcases regularly to avoid buildup of oils and bacteria.</li>
+  <li>Avoid touching or picking at acne as it can lead to scarring.</li>
+  <li>Wash your makeup brushes regularly to avoid buildup of bacteria.</li>
+  <li>Wear sunscreen every day to protect your skin from harmful UV rays.</li>
+</ul>
+<h3>Bad Habits:</h3>
+<ul>
+  <li>Avoid smoking as it can cause premature aging and damage to the skin.</li>
+  <li>Avoid excessive alcohol consumption as it can dehydrate the skin.</li>
+  <li>Avoid using harsh scrubs or exfoliants as they can irritate the skin.</li>
+  <li>Avoid using products with salicylic acid or benzoyl peroxide if the individual has an allergy to them.</li>
+  <li>Avoid consuming processed and sugary foods as they can cause inflammation and lead to acne breakouts.</li>
+</ul>
+<h3>Additional Recommendations:</h3>
+<p>Since the individual has an itching allergy, it's recommended to avoid products with fragrance and other potential irritants. Also, since they have oily skin, it's recommended to use non-comedogenic and oil-free products to avoid clogging pores.</p>"""},
 
-                    {"role": "user", "content": "{'fh':'level1', 'lc':'level0', 'rc':'level2'}"},
+                    {"role": "user", "content": "{'fh':'level2', 'lc':'level1', 'rc':'level0', 'chin':'level2', 'age':29, 'gender':'female', 'skin':'dry', 'allergies':'itching', 'diet':'non-veg'}"},
 
-                    {"role": "system", "content": """Sure, here's a customized routine for the given example:
-                    For the patch on the forehead (fh) with level 1 acne, I recommend using a gentle cleanser twice a day to help unclog pores and reduce inflammation. Applying a topical acne treatment containing salicylic acid or benzoyl peroxide can also be helpful in reducing breakouts. In addition, it is important to avoid picking or squeezing any existing pimples as this can lead to scarring and further breakouts.
-                    For the patch on the left cheek (lc) with level 0 acne, a simple routine of cleansing twice a day with a gentle cleanser and applying a non-comedogenic moisturizer afterwards is recommended. It is also important to protect the skin from UV damage by wearing a broad-spectrum sunscreen with at least SPF 30.
-                    For the patch on the right cheek (rc) with level 2 acne, I recommend using a salicylic acid or benzoyl peroxide-based cleanser in the morning and a glycolic or lactic acid-based cleanser in the evening to help exfoliate the skin and unclog pores. Applying a topical acne treatment containing benzoyl peroxide or retinoids can also help reduce inflammation and breakouts. In addition, it is important to avoid touching the face and to change pillowcases regularly to prevent the transfer of bacteria.
-                    It is important to maintain a healthy diet and lifestyle as well, as this can also affect the severity of acne. Drinking plenty of water, eating a balanced diet with plenty of fruits and vegetables, and getting enough sleep can all contribute to healthy skin. If the acne does not improve or worsens, it is recommended to consult with a dermatologist for personalized treatment options."""},
-
-                    {"role": "user", "content": """Also i need you to generate answers in way that they don't sound like they are being generated by a chat bot, leave out any sentences like "Sure, here's a customized routine for the given example:" so you need to sound like the answers are being generated by a deep learning NLP model not by a chat bot. You don't need to greet to me in the response just straight out tell the answer don't greet to me like 'here is the routine for the example' or anything like that if you understand generate the response for this json data {'fh':'level1', 'lc':'level0', 'rc':'level2', 'chin':'level1'} following my latest instructions."""},
-                    {"role": "system", "content": """For the patch on the forehead with level 1 acne, a gentle cleanser twice a day and topical acne treatment containing salicylic acid or benzoyl peroxide can help unclog pores and reduce inflammation. For the patch on the left cheek with level 0 acne, a simple routine of cleansing twice a day and applying a non-comedogenic moisturizer afterwards is recommended. For the patch on the right cheek with level 2 acne, using a salicylic acid or benzoyl peroxide-based cleanser in the morning and a glycolic or lactic acid-based cleanser in the evening, along with topical acne treatment containing benzoyl peroxide or retinoids can help reduce inflammation and breakouts. For the patch on the chin with level 1 acne, a gentle exfoliant can help remove dead skin cells and unclog pores, followed by a topical acne treatment containing salicylic acid or benzoyl peroxide. It is important to maintain a healthy diet and lifestyle and avoid picking or squeezing any existing pimples. If the acne does not improve or worsens, it is recommended to consult with a dermatologist for personalized treatment options."""},
+                    {"role": "assistant", "content": """
+                    <h3>Week-long Acne Treatment Plan</h3>
+<p>Age: 29 | Gender: Female | Skin Type: Dry | Allergies: Itching | Diet: Non-Veg</p>
+<h4>Daily Skincare Routine:</h4>
+<ul>
+  <li>Wash your face twice a day using a gentle, non-comedogenic cleanser.</li>
+  <li>Apply a moisturizer with SPF 30 or higher to protect your skin from sun damage.</li>
+  <li>Use a toner containing salicylic acid to help unclog pores and reduce acne.</li>
+  <li>Apply a spot treatment containing benzoyl peroxide to acne-prone areas.</li>
+</ul>
+<h4>Diet Recommendations:</h4>
+<ul>
+  <li>Include foods rich in vitamin A, such as sweet potatoes, carrots, and leafy greens, which can help reduce inflammation and promote healthy skin.</li>
+  <li>Avoid dairy products and high-glycemic foods, such as white bread and sugary snacks, which may worsen acne.</li>
+  <li>Incorporate foods rich in omega-3 fatty acids, such as salmon and walnuts, which can help reduce inflammation and improve skin health.</li>
+</ul>
+<h4>Good Habits:</h4>
+<ul>
+  <li>Get enough sleep each night to help reduce stress, which can trigger acne.</li>
+  <li>Drink plenty of water to stay hydrated and flush out toxins.</li>
+  <li>Exercise regularly to help reduce stress and improve overall health.</li>
+</ul>
+<h4>Bad Habits to Avoid:</h4>
+<ul>
+  <li>Avoid touching your face, as this can transfer oil and bacteria to the skin and worsen acne.</li>
+  <li>Avoid using harsh scrubs or exfoliants, which can irritate the skin and worsen acne.</li>
+  <li>Avoid picking or squeezing pimples, as this can lead to scarring and further breakouts.</li>
+</ul>
+<h4>Acne Treatment:</h4>
+<p>Based on the severity of acne on different patches of the face:</p>
+<ul>
+  <li>For level 0 acne on fh, chin: continue with daily skincare routine and good habits.</li>
+  <li>For level 1 acne on lc: use an over-the-counter retinoid cream in the evening to help unclog pores and reduce acne.</li>
+  <li>For level 2 acne on fh, rc, chin: consult a dermatologist for prescription-strength topical or oral medications.</li>
+</ul>"""},
                     {"role": "user", "content": f"{output}"},
                 ]
             )

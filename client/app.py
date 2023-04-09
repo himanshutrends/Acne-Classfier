@@ -19,9 +19,9 @@ def sentence_builder(age, sex, skin_type, allergies, diet, file):
     response = requests.post('http://127.0.0.1:5000/predict', files=payload)
     data = response.json()
 
+    
     prediction = data['prediction']
     prediction = np.array(prediction)
-    
 
     labels = ["Low", "Moderate", "Severe"]
 
@@ -29,14 +29,20 @@ def sentence_builder(age, sex, skin_type, allergies, diet, file):
     output2 = {labels[i]: float(prediction[1][i]) for i in range(3)}
     output3 = {labels[i]: float(prediction[2][i]) for i in range(3)}
 
-    content = "sample response"
 
-    # response = requests.post('http://127.0.0.1:5000/recommendation', json=data)
-    # data = response.json()
+    data['age'] = age
+    data['gender'] = sex
+    data['skin_type'] = skin_type
+    data['allergies'] = allergies
+    data['diet'] = diet
 
-    # content = data['choices'][0]['message']['content']
+    response = requests.post('http://127.0.0.1:5000/recommendation', json=data)
+    data = response.json()
+
+
+    content = data['choices'][0]['message']['content']
     
-    return data, output1, output2, output3
+    return content, output1, output2, output3
 
 demo = gr.Interface(
     sentence_builder,
@@ -52,7 +58,7 @@ demo = gr.Interface(
         gr.CheckboxGroup(["Veg", "Non-Veg",], label="Diet", info="Select your diet preference"),
         gr.Image(type="pil", label="Face Image (with open eye)"),
     ],
-    outputs=["text", gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level")]
+    outputs=[gr.HTML("html"), gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level"), gr.Label(num_top_classes=3, label="Acne Level")]
 )
 
 if __name__ == "__main__":
