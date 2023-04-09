@@ -57,7 +57,7 @@ with gr.Blocks() as demo:
                 info="Tell us your allergies and symptoms"
             )
             diet = gr.CheckboxGroup(["Veg", "Non-Veg",], label="Diet", info="Select your diet preference")
-            img = gr.Image(source="upload", type="pil", label="Face Image (with open eye)")
+            img = gr.Image(source="webcam", type="pil", label="Face Image (with open eye)")
             submit = gr.Button("Submit")
             
         with gr.Tab("Model:Severity Prediction"):
@@ -69,4 +69,4 @@ with gr.Blocks() as demo:
 
     submit.click(sentence_builder, inputs=[age, sex, skin_type, allergy, diet, img], outputs=[html_output, chin, fh, lc])
 
-demo.launch(share=True, debug=True, show_api=False)
+demo.queue().launch(share=True, debug=True, show_api=False, inline=False)
