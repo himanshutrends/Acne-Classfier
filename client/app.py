@@ -45,7 +45,7 @@ def sentence_builder(age, sex, skin_type, allergies, diet, file):
     return content, output1, output2, output3
 
 with gr.Blocks() as demo:
-    gr.Markdown("Flip text or image files using this demo.")
+    gr.Markdown("<h1>SkinZen - Your Personalized Acne Treatment</h1>")
     with gr.Row():
         with gr.Column():
             age = gr.Number(value=20, label="Age")
